@@ -48,11 +48,6 @@ func spawn(fuzzerName string, args []string) {
 	// ramdisk ) then they can provide any filename /path/to/whatever.xxx and
 	// we'll sub out 'whatever' for the name of this fuzzer and keep the base
 	// and the extension.
-	if len(*flagFile) > 0 {
-		base, _ := path.Split(*flagFile)
-		ext := path.Ext(*flagFile)
-		args = append(args, "-f", path.Join(base, fuzzerName+ext))
-	}
 
 	// Create a logfile for afl's stdout. Truncates any existing logfile.
 	fuzzerDir := path.Join(*flagOutput, fuzzerName)
@@ -67,18 +62,7 @@ func spawn(fuzzerName string, args []string) {
 	defer fd.Close()
 
 	args = append(args, "--")
-	if *flagXXX {
-		progArgs := make([]string, len(flag.Args()))
-		copy(progArgs, flag.Args())
-		for i, elem := range progArgs {
-			if subRegex.MatchString(elem) {
-				progArgs[i] = subRegex.ReplaceAllString(elem, randomName(8))
-			}
-		}
-		args = append(args, progArgs...)
-	} else {
-		args = append(args, flag.Args()...)
-	}
+	args = append(args, flag.Args()...)
 
 	cmd := exec.Command(AFLNAME, args...)
 	cmd.Stdout = fd
