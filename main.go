@@ -25,8 +25,7 @@ var (
 	flagInput    = flag.String("i", "", "afl-fuzz -i option (input location)")
 	flagExtras   = flag.String("x", "", "afl-fuzz -x option (extras location)")
 	flagOutput   = flag.String("o", "", "afl-fuzz -o option (output location)")
-	flagFile     = flag.String("f", "", "Filename template (substituted and passed via -f)")
-	flagXXX      = flag.Bool("XXX", false, "[HACK] substitute XXX in the target args with an 8 char random string [HACK]")
+	flagModel     = flag.String("g", "", "Input model (substituted and passed via -g)")
 
 	subRegex = regexp.MustCompile("XXX")
 )
@@ -118,13 +117,13 @@ func main() {
 
 	// collect the proxy args for afl-fuzz
 	baseArgs := []string{}
-	for _, v := range []string{"t", "m", "i", "x", "o"} {
+	for _, v := range []string{"t", "m", "i", "x", "o", "g"} {
 		f := flag.Lookup(v)
 		if f != nil && f.Value.String() != f.DefValue {
 			baseArgs = append(baseArgs, "-"+v, f.Value.String())
 		}
 	}
-
+	baseArgs = append(baseArgs, "-h", "-w", "peach")
 	baseName := *flagName
 	if len(baseName) == 0 {
 		baseName = randomName(5)
